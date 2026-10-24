@@ -1,0 +1,270 @@
+/* ==========================================================================
+   MODULE 4/4: ANIMATIONS & KEYFRAMES - CYBERRANK & JOKER CUTSCENE
+   ========================================================================== */
+
+/* ==================== 1. POPUP MULTI-HIT BURST ==================== */
+.multi-hit-burst {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 42px;
+  font-weight: 900;
+  color: var(--gold-neon);
+  text-shadow: 0 0 20px rgba(255, 190, 11, 0.8), 0 0 40px #ff0055;
+  z-index: 8000;
+  pointer-events: none;
+  animation: popBurst 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes popBurst {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  30% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -70%) scale(1); opacity: 0; }
+}
+
+/* ==================== 2. CUTSCENE THE JOKER (1% INSTANT WIN) ==================== */
+.joker-cutscene-container {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  animation: nightmareShake 0.12s infinite;
+}
+
+.glitch-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, transparent 25%, rgba(131, 56, 236, 0.45) 65%, #000 100%);
+  mix-blend-mode: color-dodge;
+  animation: vignetteFlicker 0.18s infinite;
+  pointer-events: none;
+}
+
+.joker-phantom {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.joker-face {
+  position: relative;
+  width: 140px;
+  height: 180px;
+  background: #fdfdfd;
+  border-radius: 70px 70px 60px 60px;
+  box-shadow: 0 0 50px rgba(255, 0, 127, 0.8), 0 0 80px rgba(131, 56, 236, 0.9);
+  animation: jokerBreath 1.2s infinite alternate ease-in-out;
+}
+
+.joker-eyes {
+  position: absolute;
+  top: 50px;
+  left: 20px;
+  width: 100px;
+  height: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.joker-eyes::before, .joker-eyes::after {
+  content: '';
+  width: 28px;
+  height: 12px;
+  background: #111;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #ff0055;
+  transform: rotate(-15deg);
+}
+
+.joker-eyes::after {
+  transform: rotate(15deg);
+}
+
+.joker-grin {
+  position: absolute;
+  bottom: 25px;
+  left: 20px;
+  width: 100px;
+  height: 50px;
+  border-bottom: 12px solid #ff0055;
+  border-radius: 0 0 50px 50px;
+  filter: drop-shadow(0 0 8px #ff0055);
+}
+
+/* BÀN TAY LAO NHANH VỀ PHÍA MÀN HÌNH */
+.joker-reaching-hand {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, #8338ec 0%, transparent 70%);
+  border: 4px solid #ff007f;
+  border-radius: 50%;
+  box-shadow: 0 0 60px #ff007f;
+  animation: reachForScreen 2.6s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+}
+
+@keyframes reachForScreen {
+  0% {
+    transform: scale(0.2) translate(0, 100px);
+    opacity: 0.1;
+  }
+  50% {
+    transform: scale(1.1) translate(0, 30px);
+    opacity: 0.8;
+  }
+  85% {
+    transform: scale(4.5) translate(0, -20px);
+    opacity: 0.95;
+    filter: blur(0px);
+  }
+  100% {
+    transform: scale(28);
+    opacity: 1;
+    filter: blur(10px);
+    background: #ff0055;
+  }
+}
+
+.joker-dialogue-box {
+  margin-top: 40px;
+  text-align: center;
+  z-index: 2;
+  padding: 0 20px;
+}
+
+.joker-quote {
+  font-family: 'Orbitron', sans-serif;
+  color: #ff0055;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow: 0 0 15px #ff0055, 2px 2px 0px #000;
+  animation: textGlitch 0.25s infinite;
+}
+
+.joker-subquote {
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--cyan-neon);
+  letter-spacing: 3px;
+  font-weight: 700;
+}
+
+@keyframes nightmareShake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  25% { transform: translate(-3px, -1px) rotate(-0.5deg); }
+  50% { transform: translate(-1px, 3px) rotate(0.5deg); }
+  75% { transform: translate(3px, 1px) rotate(0deg); }
+  100% { transform: translate(1px, -3px) rotate(-0.5deg); }
+}
+
+@keyframes vignetteFlicker {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 0.2; }
+}
+
+@keyframes textGlitch {
+  0% { transform: skew(0deg); }
+  20% { transform: skew(4deg); color: #00f2fe; }
+  40% { transform: skew(-4deg); color: #ff0055; }
+  60% { transform: translate(3px, -1px); }
+  80% { transform: translate(-3px, 1px); }
+  100% { transform: skew(0deg); }
+}
+
+@keyframes jokerBreath {
+  0% { transform: scale(0.98); }
+  100% { transform: scale(1.04); }
+}
+
+/* ==================== 3. HIỆU ỨNG TỐI THƯỢNG CHO BẬC THE ERROR (35.000+ OVR) ==================== */
+.tier-the-error {
+  animation: errorTagGlitch 0.18s infinite !important;
+}
+
+@keyframes errorTagGlitch {
+  0% { transform: skew(0deg); text-shadow: 2px 0 red, -2px 0 cyan; }
+  50% { transform: skew(5deg); text-shadow: -2px 0 red, 2px 0 cyan; }
+  100% { transform: skew(0deg); text-shadow: 2px 0 red, -2px 0 cyan; }
+}
+
+/* ==================== 4. SAO CẦU VỒNG QUANG PHỔ 7 MÀU (🌈) ==================== */
+.rainbow-badge-txt {
+  animation: rainbowTextShine 2.5s ease infinite;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+@keyframes rainbowTextShine {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ==================== 5. HOẠT ẢNH GACHA 3D & LẬT THẺ ==================== */
+.card-3d-wrap {
+  perspective: 1000px;
+  width: 130px;
+  height: 185px;
+  cursor: pointer;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-style: preserve-3d;
+}
+
+.card-3d-wrap.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.card-back {
+  background: linear-gradient(135deg, #181d30, #0d101d);
+  border: 2px dashed rgba(0, 242, 254, 0.4);
+  font-size: 34px;
+}
+
+.card-front {
+  background: var(--bg-card);
+  transform: rotateY(180deg);
+  border: 2px solid var(--border-subtle);
+}
+
+/* ==================== 6. MINIGAME TARGET POP ==================== */
+.coin-target, .gem-target, .bomb-target {
+  position: absolute;
+  font-size: 38px;
+  cursor: pointer;
+  animation: floatPop 0.35s ease;
+}
+
+@keyframes floatPop {
+  0% { transform: scale(0.2); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
