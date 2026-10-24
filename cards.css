@@ -1,0 +1,229 @@
+/* ==========================================================================
+   MODULE 2/4: CARDS & RAINBOW STAR SYSTEM - CYBERRANK & 5 DAYS EVENT
+   ========================================================================== */
+
+/* ==================== KHUNG THẺ BÀI CƠ BẢN ==================== */
+.battle-card {
+  width: 140px;
+  min-height: 195px;
+  background: var(--bg-card);
+  border: 2px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.battle-card:hover {
+  transform: translateY(-4px);
+  z-index: 5;
+}
+
+/* TRẠNG THÁI TRONG TRẬN ĐẤU */
+.battle-card.selected-attacker {
+  border-color: var(--cyan-neon) !important;
+  box-shadow: 0 0 20px var(--cyan-neon);
+  transform: scale(1.05) translateY(-2px);
+  z-index: 10;
+}
+
+.battle-card.targetable {
+  border-color: var(--danger-red) !important;
+  box-shadow: 0 0 15px var(--danger-red);
+}
+
+.battle-card.dead {
+  filter: grayscale(1) opacity(0.35);
+  pointer-events: none;
+  transform: none !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  box-shadow: none !important;
+}
+
+/* ==================== VIỀN HÀO QUANG THEO PHẨM CẤP ==================== */
+.battle-card.rank-c { 
+  border-color: #6c757d; 
+  background: linear-gradient(180deg, #181d2a 0%, #111420 100%);
+}
+
+.battle-card.rank-b { 
+  border-color: #2ec4b6; 
+  box-shadow: 0 0 8px rgba(46, 196, 182, 0.2);
+}
+
+.battle-card.rank-a { 
+  border-color: #3a86ff; 
+  box-shadow: 0 0 10px rgba(58, 134, 255, 0.3);
+}
+
+.battle-card.rank-s { 
+  border-color: var(--gold-neon); 
+  box-shadow: 0 0 14px rgba(255, 190, 11, 0.35);
+  background: linear-gradient(180deg, #25232d 0%, #181622 100%);
+}
+
+.battle-card.rank-sss { 
+  border-color: var(--pink-neon); 
+  box-shadow: 0 0 18px rgba(255, 0, 127, 0.45);
+  background: linear-gradient(180deg, #2b182e 0%, #181124 100%);
+}
+
+.battle-card.rank-event { 
+  border-color: #ff5400; 
+  box-shadow: 0 0 18px rgba(255, 84, 0, 0.55);
+  background: linear-gradient(180deg, #2b1b18 0%, #191216 100%);
+}
+
+/* VIỀN ĐỘC QUYỀN: THE JOKER (EVENT_EXCLUSIVE - 25/10) */
+.battle-card.rank-event_exclusive {
+  border: 2px solid #8338ec;
+  box-shadow: 0 0 22px #8338ec, inset 0 0 14px rgba(255, 0, 127, 0.35);
+  background: linear-gradient(145deg, #1f1435 0%, #0d0918 100%);
+}
+
+/* ==================== CƠ CHẾ SAO VÔ HẠN & SAO CẦU VỒNG 🌈 ==================== */
+.card-stars {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold-neon);
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+/* THẺ ĐÃ ĐỘT PHÁ TỪ 7 SAO TRỞ LÊN (CÓ CHỨA 🌈) */
+.card-stars.has-rainbow {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+.rainbow-badge-txt {
+  background: linear-gradient(90deg, #ff007f, #8338ec, #00f2fe, #00f076, #ffbe0b, #ff007f);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 900;
+}
+
+/* ==================== CHI TIẾT NỘI DUNG TRÊN THẺ ==================== */
+.card-element-tag {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.card-rank-tag {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid currentColor;
+}
+
+.card-art-emoji {
+  font-size: 34px;
+  margin: 4px 0 2px 0;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  margin-bottom: 6px;
+  color: var(--text-main);
+}
+
+/* THANH MÁU TRÊN THẺ */
+.card-hp-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-hp-fill {
+  height: 100%;
+  background: var(--green-neon);
+  box-shadow: 0 0 6px var(--green-neon);
+  transition: width 0.3s ease;
+}
+
+.card-hp-fill.critical-hp {
+  background: var(--danger-red);
+  box-shadow: 0 0 6px var(--danger-red);
+}
+
+/* THÔNG SỐ CHIẾN ĐẤU */
+.card-combat-stats {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0 2px;
+}
+
+.card-combat-stats .atk { 
+  color: #ff5964; 
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.card-combat-stats .spd { 
+  color: var(--cyan-neon); 
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* BUFF HIỆU ỨNG TẠM THỜI (VÍ DỤ BỘ BÀI TỬ THẦN 170% CỦA JOKER) */
+.card-buffed-glow {
+  box-shadow: 0 0 20px #ff0055, inset 0 0 10px #ff0055 !important;
+  border-color: #ff0055 !important;
+}
+
+.card-stunned-mask {
+  filter: grayscale(0.8) brightness(0.6);
+  position: relative;
+}
+
+.card-stunned-mask::after {
+  content: '💫 CHOÁNG';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: var(--gold-neon);
+  font-size: 10px;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--gold-neon);
+}
