@@ -1,0 +1,579 @@
+/* ==========================================================================
+   MODULE 1/4: BASE SYSTEM & CORE UI - CYBERRANK & 5 DAYS EVENT EDITION
+   ========================================================================== */
+
+:root {
+  --bg-deep: #0a0c14;
+  --bg-surface: #121624;
+  --bg-panel: #181d30;
+  --bg-card: #1f253d;
+  
+  --cyan-neon: #00f2fe;
+  --blue-neon: #4facfe;
+  --pink-neon: #ff007f;
+  --gold-neon: #ffbe0b;
+  --green-neon: #00f076;
+  --purple-neon: #8338ec;
+  --danger-red: #ff3366;
+  --text-main: #f8f9fa;
+  --text-muted: #8d99ae;
+  
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --shadow-neon-cyan: 0 0 15px rgba(0, 242, 254, 0.35);
+  --shadow-neon-pink: 0 0 20px rgba(255, 0, 127, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body.cyber-theme {
+  background-color: var(--bg-deep);
+  color: var(--text-main);
+  font-family: 'Rajdhani', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(circle at 15% 20%, rgba(0, 242, 254, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(255, 0, 127, 0.04) 0%, transparent 40%);
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ==================== GLOBAL SERVER ALERT ==================== */
+.server-alert-banner {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(18, 22, 36, 0.95);
+  border: 1px solid var(--cyan-neon);
+  box-shadow: var(--shadow-neon-cyan);
+  padding: 8px 24px;
+  border-radius: 30px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.pulse-dot {
+  width: 10px;
+  height: 10px;
+  background: var(--cyan-neon);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--cyan-neon);
+  animation: pulseLight 1.5s infinite;
+}
+
+@keyframes pulseLight {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* ==================== TOP CYBER HUD ==================== */
+.top-cyber-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 12px 24px;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.hud-profile-zone {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 240px;
+}
+
+.avatar-ring {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--cyan-neon);
+  box-shadow: var(--shadow-neon-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+}
+
+.avatar-core {
+  font-size: 24px;
+}
+
+.profile-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.name-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.player-name {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text-main);
+}
+
+.level-badge {
+  background: rgba(0, 242, 254, 0.15);
+  border: 1px solid var(--cyan-neon);
+  color: var(--cyan-neon);
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.exp-bar-track {
+  width: 140px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.exp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue-neon), var(--cyan-neon));
+  box-shadow: 0 0 8px var(--cyan-neon);
+  transition: width 0.4s ease;
+}
+
+.meta-subtext {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ==================== TEAM OVR ZONE & 11 BẬC ==================== */
+.hud-ovr-zone {
+  display: flex;
+  justify-content: center;
+}
+
+.ovr-card-frame {
+  background: linear-gradient(135deg, rgba(24, 29, 48, 0.9), rgba(31, 37, 61, 0.9));
+  border: 1px solid rgba(0, 242, 254, 0.3);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  padding: 8px 24px;
+  border-radius: 8px;
+  text-align: center;
+  min-width: 170px;
+  position: relative;
+}
+
+.ovr-label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.ovr-value {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--cyan-neon);
+  text-shadow: 0 0 10px rgba(0, 242, 254, 0.6);
+}
+
+.ovr-tier-tag {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 2px;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+}
+
+/* THIẾT KẾ ĐẶC BIỆT BẬC: THE ERROR (35.000+ OVR) */
+.ovr-tier-tag.tier-the-error {
+  color: #ff0055 !important;
+  border-color: #ff0055 !important;
+  background: rgba(255, 0, 85, 0.15);
+  box-shadow: 0 0 15px #ff0055;
+}
+
+/* ==================== TÀI NGUYÊN NGƯỜI CHƠI ==================== */
+.hud-currencies-zone {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.currency-chip {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.chip-gold .chip-amount { color: var(--gold-neon); }
+.chip-gems .chip-amount { color: #d68cff; }
+.chip-dust .chip-amount { color: #ffd166; }
+.chip-superdust .chip-amount { color: var(--cyan-neon); }
+.chip-cards .chip-amount { color: #f72585; }
+
+/* ==================== MAIN NAVIGATION TABS ==================== */
+.main-navigation {
+  display: flex;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 24px;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.nav-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.nav-btn:hover {
+  color: var(--text-main);
+}
+
+.nav-btn.active {
+  color: var(--cyan-neon);
+  border-bottom-color: var(--cyan-neon);
+  text-shadow: var(--shadow-neon-cyan);
+}
+
+.btn-admin-tab {
+  margin-left: auto;
+  color: #ff0055;
+}
+
+/* ==================== VIEWPORT CONTAINER ==================== */
+.cyber-viewport {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+/* ==================== BUTTONS CHUNG ==================== */
+button {
+  font-family: 'Rajdhani', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.btn-cyan {
+  background: linear-gradient(135deg, var(--blue-neon), var(--cyan-neon));
+  border: none;
+  color: #04121c;
+  padding: 8px 16px;
+}
+
+.btn-cyan:hover {
+  box-shadow: var(--shadow-neon-cyan);
+  transform: translateY(-1px);
+}
+
+.btn-cyan-outline {
+  background: transparent;
+  border: 1px solid var(--cyan-neon);
+  color: var(--cyan-neon);
+  padding: 6px 14px;
+}
+
+.btn-cyan-outline:hover {
+  background: rgba(0, 242, 254, 0.1);
+  box-shadow: var(--shadow-neon-cyan);
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, #f77f00, var(--gold-neon));
+  border: none;
+  color: #120e03;
+  padding: 8px 16px;
+}
+
+.btn-gold:hover {
+  box-shadow: 0 0 15px rgba(255, 190, 11, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-gold-large {
+  background: linear-gradient(135deg, #f77f00, var(--gold-neon));
+  border: none;
+  color: #120e03;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.btn-gold-large:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.btn-danger {
+  background: var(--danger-red);
+  border: none;
+  color: #fff;
+  padding: 8px 16px;
+}
+
+.btn-danger-large {
+  background: transparent;
+  border: 1px solid var(--danger-red);
+  color: var(--danger-red);
+  padding: 12px 20px;
+}
+
+.btn-danger-large:hover:not(:disabled) {
+  background: rgba(255, 51, 102, 0.15);
+}
+
+.btn-danger-large:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-danger-outline {
+  background: transparent;
+  border: 1px solid var(--danger-red);
+  color: var(--danger-red);
+  padding: 6px 12px;
+}
+
+.btn-neon-pink {
+  background: linear-gradient(135deg, #8338ec, #ff007f);
+  border: none;
+  color: #fff;
+  padding: 8px 16px;
+}
+
+.btn-neon-pink-small {
+  background: linear-gradient(135deg, #8338ec, #ff007f);
+  border: none;
+  color: #fff;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.btn-gold-small {
+  background: var(--gold-neon);
+  border: none;
+  color: #000;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  padding: 8px 16px;
+}
+
+.btn-outline:hover {
+  color: var(--text-main);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-close-icon {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.btn-close-icon:hover {
+  color: #ff0055;
+}
+
+/* ==================== CÁC MODAL HỆ THỐNG ==================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.cyber-modal-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--cyan-neon);
+  box-shadow: var(--shadow-neon-cyan);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.cyber-modal-card.celebration {
+  text-align: center;
+}
+
+.congrats-title {
+  font-family: 'Orbitron', sans-serif;
+  color: var(--gold-neon);
+  font-size: 22px;
+}
+
+.level-highlight {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--cyan-neon);
+  margin: 14px 0;
+}
+
+.rewards-box {
+  background: var(--bg-panel);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.rewards-box h4 {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-header h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  color: var(--cyan-neon);
+}
+
+.checkbox-ranks-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.rank-chk {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.danger-chk {
+  border-color: rgba(255, 0, 127, 0.4);
+  color: #ff5964;
+}
+
+.batch-preview-box {
+  background: #0c0f1c;
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+/* ADMIN MODAL WIDE */
+.admin-modal-wide {
+  max-width: 900px;
+}
+
+.admin-top-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.admin-table-wrapper {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.admin-table th, .admin-table td {
+  border: 1px solid var(--border-subtle);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.admin-table th {
+  background: var(--bg-panel);
+  color: var(--cyan-neon);
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+}
