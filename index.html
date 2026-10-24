@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Card Legends - CyberRank & 5 Days Anniversary</title>
+  
+  <!-- 4 DI SẢN CSS -->
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="cards.css">
+  <link rel="stylesheet" href="battle.css">
+  <link rel="stylesheet" href="animations.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body class="cyber-theme">
+
+  <!-- BANNER THÔNG BÁO HỆ THỐNG / MÁY CHỦ -->
+  <div id="globalServerAlert" class="server-alert-banner hidden">
+    <span class="pulse-dot"></span>
+    <span id="alertMessage">Hệ thống đồng bộ dữ liệu CyberRank sẵn sàng.</span>
+  </div>
+
+  <!-- POPUP MULTI-HIT & CHIÊU THỨC CHIẾN ĐẤU -->
+  <div id="multiHitBurst" class="multi-hit-burst hidden">COMBO BURST!</div>
+
+  <!-- CUTSCENE ĐỘC QUYỀN: THE JOKER - KẾT THÚC MỌI KHỔ ĐAU (1% INSTANT WIN) -->
+  <div id="jokerCutsceneOverlay" class="joker-cutscene-container hidden">
+    <div class="glitch-vignette"></div>
+    <div class="joker-phantom">
+      <div class="joker-face">
+        <div class="joker-eyes"></div>
+        <div class="joker-grin"></div>
+      </div>
+      <div class="joker-reaching-hand"></div>
+    </div>
+    <div class="joker-dialogue-box">
+      <p class="joker-quote">"MỌI BIỆN PHÁP PHÒNG THỦ CHẲNG QUA CHỈ LÀ TRẤN AN TINH THẦN TẠM THỜI..."</p>
+      <span class="joker-subquote">KHI GÃ RÚ LÊN, KHÔNG GÌ CÓ THỂ CẢN PHÁ!</span>
+    </div>
+  </div>
+
+  <!-- ==================== TOP NAVIGATION & HUD ==================== -->
+  <header class="top-cyber-hud">
+    <div class="hud-profile-zone">
+      <div class="avatar-ring">
+        <div class="avatar-core">🃏</div>
+      </div>
+      <div class="profile-meta">
+        <div class="name-badge-row">
+          <span id="playerDisplayName" class="player-name">Chiến Binh Cyber</span>
+          <span id="playerLevelTag" class="cyber-badge level-badge">Lv.1</span>
+        </div>
+        <div class="exp-bar-track">
+          <div id="expFill" class="exp-bar-fill" style="width: 0%;"></div>
+        </div>
+        <span id="expText" class="meta-subtext">0/175 EXP (0%)</span>
+      </div>
+    </div>
+
+    <!-- KHUNG OVR TỔNG LỰC CHIẾN & 11 BẬC CYBERRANK -->
+    <div class="hud-ovr-zone">
+      <div class="ovr-card-frame">
+        <span class="ovr-label">TEAM OVR</span>
+        <span id="teamOvrScore" class="ovr-value">0</span>
+        <div id="teamOvrTierTag" class="ovr-tier-tag">Newbie</div>
+      </div>
+    </div>
+
+    <!-- TÀI NGUYÊN NGƯỜI CHƠI -->
+    <div class="hud-currencies-zone">
+      <div class="currency-chip chip-gold" title="Vàng">
+        <span class="chip-icon">🪙</span>
+        <span id="goldDisplay" class="chip-amount">5,000</span>
+      </div>
+      <div class="currency-chip chip-gems" title="Tinh Thạch">
+        <span class="chip-icon">💎</span>
+        <span id="gemDisplay" class="chip-amount">50</span>
+      </div>
+      <div class="currency-chip chip-dust" title="Bụi Sao Thường">
+        <span class="chip-icon">🌟</span>
+        <span id="dustDisplay" class="chip-amount">2,000</span>
+      </div>
+      <div class="currency-chip chip-superdust" title="Bụi Sao Siêu Cấp">
+        <span class="chip-icon">🌠</span>
+        <span id="superDustDisplay" class="chip-amount">10</span>
+      </div>
+      <div class="currency-chip chip-cards" title="Kho Thẻ Bài">
+        <span class="chip-icon">🎴</span>
+        <span id="totalCardsCount" class="chip-amount">0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MENU TABS CHÍNH ==================== -->
+  <nav class="main-navigation">
+    <button class="nav-btn active" data-tab="arenaTab">⚔️ SÀN ĐẤU</button>
+    <button class="nav-btn" data-tab="deckTab">🛡️ ĐỘI HÌNH & KHO</button>
+    <button class="nav-btn" data-tab="gachaTab">✨ CHIÊU MỘ</button>
+    <button class="nav-btn" data-tab="forgeTab">🔥 LÒ RÈN BỤI SAO</button>
+    <button class="nav-btn" data-tab="shopTab">🏬 CỬA HÀNG</button>
+    <button class="nav-btn" data-tab="minigameTab">🎯 THỬ THÁCH 30S</button>
+    <button class="nav-btn btn-admin-tab" onclick="openAdminModal()">⚙️ ADMIN</button>
+  </nav>
+
+  <!-- ==================== NỘI DUNG TỪNG TAB ==================== -->
+  <main class="cyber-viewport">
+
+    <!-- 1. TAB SÀN ĐẤU & COMBAT -->
+    <section id="arenaTab" class="tab-pane active">
+      <!-- SẢNH CHỌN MỤC TIÊU BOT / BOSS -->
+      <div id="botSelectView" class="arena-lobby-grid">
+        <div class="bot-card-panel">
+          <div class="panel-header">
+            <h3>ĐẤU TRƯỜNG BOT (OVR CÂN BẰNG)</h3>
+            <p>Hệ thống tự động đồng bộ và gia tăng chỉ số vượt trên OVR của bạn.</p>
+          </div>
+          <div class="bot-tier-cards-row">
+            <div class="bot-box bot-1">
+              <h4>BOT 1 - TẬP SỰ</h4>
+              <p>OVR: 95% - 100%</p>
+              <button class="btn-cyan" onclick="startQuickMatch(1)">GHÉP NHANH ⚡</button>
+            </div>
+            <div class="bot-box bot-2">
+              <h4>BOT 2 - GÁC CỔNG</h4>
+              <p>OVR: 105% - 110%</p>
+              <button class="btn-cyan" onclick="startQuickMatch(2)">GHÉP NHANH ⚡</button>
+            </div>
+            <div class="bot-box bot-3">
+              <h4>BOT 3 - NINJA</h4>
+              <p>OVR: 115% - 120% (Focus Yếu Máu)</p>
+              <button class="btn-cyan" onclick="startQuickMatch(3)">GHÉP NHANH ⚡</button>
+            </div>
+            <div class="bot-box bot-4">
+              <h4>BOT 4 - LONG TƯỚNG</h4>
+              <p>OVR: 125% - 130% (Khắc Hệ)</p>
+              <button class="btn-cyan" onclick="startQuickMatch(4)">GHÉP NHANH ⚡</button>
+            </div>
+            <div class="bot-box bot-5">
+              <h4>BOT 5 - MA THẦN</h4>
+              <p>OVR: 140% - 150% (Sát Thủ Toàn Diện)</p>
+              <button class="btn-cyan" onclick="startQuickMatch(5)">GHÉP NHANH ⚡</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="boss-raid-panel">
+          <div class="panel-header">
+            <h3>PHỤ BẢN BOSS THẾ GIỚI & THE ERROR</h3>
+            <p>Săn lượng lớn Bụi Sao Thường 🌟 và Bụi Sao Siêu Cấp 🌠 để rèn Sao Cầu Vồng 🌈.</p>
+          </div>
+          <div class="boss-cards-grid">
+            <div class="boss-entry boss-1">
+              <div class="boss-info">
+                <h4>HẮC LONG VƯƠNG (SSS)</h4>
+                <span>Yêu cầu: Lv.3 | OVR Đột Phá 180%</span>
+              </div>
+              <button class="btn-gold" onclick="startBossRaid('BOSS_DRAGON')">KHIÊU CHIẾN</button>
+            </div>
+            <div class="boss-entry boss-2">
+              <div class="boss-info">
+                <h4>CHÚA TỂ BĂNG DIỆT (SSS)</h4>
+                <span>Yêu cầu: Lv.6 | OVR Đột Phá 190%</span>
+              </div>
+              <button class="btn-gold" onclick="startBossRaid('BOSS_FROST')">KHIÊU CHIẾN</button>
+            </div>
+            <div class="boss-entry boss-error">
+              <div class="boss-info">
+                <h4 class="error-glitch-text">THE ERROR MA THẦN (👾)</h4>
+                <span>Yêu cầu: Lv.8 | OVR Vô Cực 200%</span>
+              </div>
+              <button class="btn-neon-pink" onclick="startBossRaid('BOSS_THE_ERROR')">PHÁ VỠ LỖI</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SÀN ĐẤU TRẬN (COMBAT ARENA VIEW) -->
+      <div id="battleArenaView" class="combat-arena-container hidden">
+        <div class="combat-top-status">
+          <div id="turnIndicator" class="turn-indicator">LƯỢT CỦA BẠN</div>
+          <div id="botSubCount" class="sub-counter-badge">Dự bị địch: 0</div>
+          <button class="btn-danger-outline" onclick="surrenderBattle()">ĐẦU HÀNG</button>
+        </div>
+
+        <!-- HÀNG THẺ ĐỐI THỦ -->
+        <div class="battle-row bot-row">
+          <div class="row-label">ĐỘI HÌNH ĐỐI THỦ</div>
+          <div id="botFieldSlots" class="card-field-row"></div>
+        </div>
+
+        <!-- BẢNG NHẬT KÝ CHIẾN THUẬT -->
+        <div class="combat-center-console">
+          <div id="combatLogText" class="log-marquee">Chuẩn bị xuất trận...</div>
+        </div>
+
+        <!-- HÀNG THẺ NGƯỜI CHƠI -->
+        <div class="battle-row player-row">
+          <div class="row-label">ĐỘI HÌNH TIÊN PHONG CỦA BẠN</div>
+          <div id="playerFieldSlots" class="card-field-row"></div>
+        </div>
+
+        <!-- THANH QUÂN DỰ BỊ VÀ CÔNG CỤ BUFF CHIẾN ĐẤU -->
+        <div class="battle-footer-bar">
+          <div class="player-bench-tray">
+            <span id="playerBenchCountTxt" class="tray-title">Dự bị: 0/2</span>
+            <div id="playerBenchSlots" class="bench-mini-row"></div>
+          </div>
+
+          <div class="battle-tactical-buffs">
+            <button class="buff-action-btn buff-heal" onclick="triggerBuff('HEAL')">
+              🧪 HỒI MÁU (<span id="countBuffHeal">0</span>)
+            </button>
+            <button class="buff-action-btn buff-shield" onclick="triggerBuff('SHIELD')">
+              🛡️ KHIÊN BẤT TỬ (<span id="countBuffShield">0</span>)
+            </button>
+            <button class="buff-action-btn buff-atk" onclick="triggerBuff('OVERLOAD')">
+              ⚡ BẠO KÍCH (<span id="countBuffAtk">0</span>)
+            </button>
+            <button class="buff-action-btn buff-speed" onclick="triggerBuff('HASTE')">
+              🌪️ THẦN TỐC (<span id="countBuffSpeed">0</span>)
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. TAB ĐỘI HÌNH & KHO THẺ -->
+    <section id="deckTab" class="tab-pane">
+      <div class="deck-management-layout">
+        <div class="formation-builder-box">
+          <div class="box-title-row">
+            <h3>TIÊN PHONG (5 THẺ CHÍNH - 80% TRỌNG SỐ OVR)</h3>
+            <button class="btn-cyan-outline" onclick="autoOptimizeFormation()">⚡ XẾP ĐỘI HÌNH TỐI ƯU</button>
+          </div>
+          <div id="deckMainRow" class="deck-formation-row"></div>
+
+          <div class="box-title-row sub-deck-margin">
+            <h3>GHẾ DỰ BỊ (<span id="deckSubCountBadge">2</span> Ô - 20% TRỌNG SỐ OVR)</h3>
+            <button class="btn-gold-outline" onclick="upgradeBenchCapacity()">➕ MỞ RỘNG Ô DỰ BỊ</button>
+          </div>
+          <div id="deckSubRow" class="deck-formation-row sub-row"></div>
+        </div>
+
+        <div class="inventory-collection-box">
+          <div class="filter-header-row">
+            <h3>KHO THẺ BÀI SỞ HỮU</h3>
+            <div class="filter-group">
+              <button class="filter-btn active" onclick="filterCards('ALL')">Tất Cả</button>
+              <button class="filter-btn" onclick="filterCards('EVENT_EXCLUSIVE')">🃏 Joker</button>
+              <button class="filter-btn" onclick="filterCards('EVENT')">🎃 Halloween</button>
+              <button class="filter-btn" onclick="filterCards('SSS')">SSS</button>
+              <button class="filter-btn" onclick="filterCards('S')">S</button>
+              <button class="filter-btn" onclick="filterCards('A')">A</button>
+              <button class="filter-btn" onclick="filterCards('B')">B</button>
+              <button class="filter-btn" onclick="filterCards('C')">C</button>
+            </div>
+            <button class="btn-danger-outline" onclick="openBatchScrapModal()">♻️ PHÂN TÁCH HÀNG LOẠT</button>
+          </div>
+          <div id="collectionGrid" class="cards-display-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. TAB GACHA CHIÊU MỘ -->
+    <section id="gachaTab" class="tab-pane">
+      <div id="gachaStoreView" class="gacha-hub-container">
+        <div class="pack-size-selector-bar">
+          <span class="selector-label">Chọn số lượng mở gói:</span>
+          <div class="size-buttons">
+            <button class="btn-size" data-size="1" onclick="setPackSize(1)">x1</button>
+            <button class="btn-size" data-size="5" onclick="setPackSize(5)">x5</button>
+            <button class="btn-size" data-size="10" onclick="setPackSize(10)">x10</button>
+            <button class="btn-size active" data-size="25" onclick="setPackSize(25)">x25</button>
+            <button class="btn-size" data-size="50" onclick="setPackSize(50)">x50</button>
+          </div>
+        </div>
+
+        <!-- CHIÊU MỘ BẰNG VÀNG 🪙 -->
+        <div class="gacha-tier-section">
+          <h3 class="section-title">CHIÊU MỘ BẰNG VÀNG (🪙)</h3>
+          <div class="gacha-cards-grid">
+            <div class="gacha-pack-card pack-bronze">
+              <div class="pack-icon">🥉</div>
+              <h4>GÓI ĐỒNG</h4>
+              <p>C: 75% | B: 20% | A: 5%</p>
+              <button id="btnBuyBronze" class="btn-gacha-buy" onclick="buyGachaPack('BRONZE')">MỞ</button>
+            </div>
+            <div class="gacha-pack-card pack-silver">
+              <div class="pack-icon">🥈</div>
+              <h4>GÓI BẠC</h4>
+              <p>B: 60% | A: 32% | S: 8%</p>
+              <button id="btnBuySilver" class="btn-gacha-buy" onclick="buyGachaPack('SILVER')">MỞ</button>
+            </div>
+            <div class="gacha-pack-card pack-gold">
+              <div class="pack-icon">🥇</div>
+              <h4>GÓI VÀNG</h4>
+              <p>A: 55% | S: 38% | SSS: 7%</p>
+              <button id="btnBuyGold" class="btn-gacha-buy" onclick="buyGachaPack('GOLD')">MỞ</button>
+            </div>
+            <div class="gacha-pack-card pack-diamond">
+              <div class="pack-icon">💎</div>
+              <h4>GÓI KIM CƯƠNG (EVENT 25/10)</h4>
+              <p>S: 48% | SSS: 44% | 🎃: 7% | <b>🃏 The Joker: 1%</b></p>
+              <button id="btnBuyDiamond" class="btn-gacha-buy" onclick="buyGachaPack('DIAMOND')">MỞ</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHIÊU MỘ BẰNG TINH THẠCH 💎 -->
+        <div class="gacha-tier-section">
+          <h3 class="section-title">CHIÊU MỘ CAO CẤP BẰNG TINH THẠCH (💎)</h3>
+          <div class="gacha-cards-grid">
+            <div class="gacha-pack-card pack-gem-rare">
+              <div class="pack-icon">🔮</div>
+              <h4>HÒM TINH THẠCH HIẾM</h4>
+              <p>Bảo hiểm tối thiểu Rank S. S: 70% | SSS: 25% | 🎃: 4% | <b>🃏 The Joker: 1%</b></p>
+              <div class="gem-buy-buttons">
+                <button class="btn-gold-small" onclick="buyGemGachaPack('RARE', 1)">Mở x1 (15 💎)</button>
+                <button class="btn-gold-small" onclick="buyGemGachaPack('RARE', 10)">Mở x10 (135 💎)</button>
+              </div>
+            </div>
+            <div class="gacha-pack-card pack-gem-mythic">
+              <div class="pack-icon">🌌</div>
+              <h4>HÒM KỶ NIỆM 5 NGÀY (THẦN THOẠI)</h4>
+              <p>Bảo hiểm tối thiểu Rank SSS! SSS: 80% | 🎃: 18% | <b>🃏 The Joker: 2%</b></p>
+              <div class="gem-buy-buttons">
+                <button class="btn-neon-pink-small" onclick="buyGemGachaPack('MYTHIC', 1)">Mở x1 (35 💎)</button>
+                <button class="btn-neon-pink-small" onclick="buyGemGachaPack('MYTHIC', 10)">Mở x10 (300 💎)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MÀN HÌNH LẬT THẺ GACHA -->
+      <div id="gachaRevealView" class="gacha-reveal-container hidden">
+        <div class="reveal-header">
+          <h3>KẾT QUẢ CHIÊU MỘ TƯỚNG</h3>
+          <div class="reveal-actions">
+            <button class="btn-cyan-outline" onclick="skipPackReveal()">⚡ LẬT TẤT CẢ</button>
+            <button id="closeRevealBtn" class="btn-gold hidden" onclick="finishPackOpening()">HOÀN THÀNH</button>
+          </div>
+        </div>
+        <div id="cardsRevealGrid" class="cards-reveal-grid"></div>
+      </div>
+    </section>
+
+    <!-- 4. TAB LÒ RÈN BỤI SAO & CẢNH GIỚI NON-STOP -->
+    <section id="forgeTab" class="tab-pane">
+      <div class="forge-workstation-layout">
+        <div class="forge-left-panel">
+          <h3 id="forgeUpgradeTitle">LÒ RÈN THĂNG CẢNH GIỚI VÔ TẬN</h3>
+          <p class="forge-desc">Tích lũy 7 sao vàng (⭐) để thăng hoa thành 1 Sao Cầu Vồng (🌈). Không giới hạn trần sức mạnh.</p>
+
+          <div id="forgeTargetBox" class="forge-active-slot">
+            <div class="forge-empty-prompt">Bấm "Chọn Rèn" ở danh sách bên phải để đưa thẻ vào lò</div>
+          </div>
+
+          <div class="forge-requirements-sheet">
+            <div id="reqDust" class="req-row">🌟 Bụi Sao Thường: 0 / 0</div>
+            <div id="reqSuperDust" class="req-row">🌠 Bụi Sao Siêu Cấp: Không cần</div>
+          </div>
+
+          <div class="forge-action-buttons">
+            <button id="btnExecuteUpgrade" class="btn-gold-large" disabled onclick="executeCardUpgrade()">
+              🔥 NÂNG SAO THẺ BÀI
+            </button>
+            <button id="btnScrapSelectedCard" class="btn-danger-large" disabled onclick="scrapSelectedCard()">
+              ♻️ PHÂN TÁCH LẺ
+            </button>
+          </div>
+          <div id="scrapValuePreview" class="scrap-hint">Nhận: - Bụi Sao</div>
+        </div>
+
+        <div class="forge-right-panel">
+          <div class="forge-picker-filter">
+            <h4>DANH SÁCH THẺ TRONG KHO</h4>
+            <div class="forge-filter-row">
+              <button class="filter-btn active" onclick="filterForgeCards('ALL')">Tất Cả</button>
+              <button class="filter-btn" onclick="filterForgeCards('EVENT_EXCLUSIVE')">🃏 Joker</button>
+              <button class="filter-btn" onclick="filterForgeCards('EVENT')">🎃 Event</button>
+              <button class="filter-btn" onclick="filterForgeCards('SSS')">SSS</button>
+              <button class="filter-btn" onclick="filterForgeCards('S')">S</button>
+              <button class="filter-btn" onclick="filterForgeCards('A')">A</button>
+            </div>
+          </div>
+          <div id="forgeCardsPicker" class="forge-picker-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. TAB CỬA HÀNG -->
+    <section id="shopTab" class="tab-pane">
+      <div class="shop-hub-layout">
+        <div class="shop-section">
+          <h3>KHO VẬT PHẨM BUFF CHIẾN THUẬT (💎)</h3>
+          <div class="shop-cards-grid">
+            <div class="shop-item-card">
+              <div class="item-icon">🧪</div>
+              <h4>HUYẾT DƯỢC</h4>
+              <p>Hồi phục tức thì 35% HP toàn đội hình.</p>
+              <button class="btn-cyan-small" onclick="buyBuff('HEAL', 10)">MUA (10 💎)</button>
+            </div>
+            <div class="shop-item-card">
+              <div class="item-icon">🛡️</div>
+              <h4>KHIÊN BẤT TỬ</h4>
+              <p>Hấp thụ 100% đòn đánh kế tiếp của địch.</p>
+              <button class="btn-cyan-small" onclick="buyBuff('SHIELD', 15)">MUA (15 💎)</button>
+            </div>
+            <div class="shop-item-card">
+              <div class="item-icon">⚡</div>
+              <h4>BẠO KÍCH OVERLOAD</h4>
+              <p>Tăng +60% công kích cho đòn đánh kế tiếp.</p>
+              <button class="btn-cyan-small" onclick="buyBuff('OVERLOAD', 12)">MUA (12 💎)</button>
+            </div>
+            <div class="shop-item-card">
+              <div class="item-icon">🌪️</div>
+              <h4>THẦN TỐC HASTE</h4>
+              <p>Kích hoạt liên hoàn 8 cú đánh liên tiếp.</p>
+              <button class="btn-cyan-small" onclick="buyBuff('HASTE', 12)">MUA (12 💎)</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="shop-section">
+          <h3>MỞ RỘNG GHẾ DỰ BỊ ĐỘI HÌNH</h3>
+          <div class="bench-upgrade-widget">
+            <p>Số ô hiện tại: <b><span id="currentBenchSlotsTxt">2</span> / 10 ô</b> (Góp 20% vào điểm Team OVR).</p>
+            <p id="benchUpgradeCostTxt" class="cost-note">Chi phí: 30 💎</p>
+            <button class="btn-gold" onclick="upgradeBenchCapacity()">NÂNG CẤP THÊM 1 Ô DỰ BỊ</button>
+          </div>
+        </div>
+
+        <div class="shop-section">
+          <h3>CHỢ GIAO THƯƠNG TÀI NGUYÊN (EXCHANGE MARKET)</h3>
+          <div class="market-exchange-grid">
+            <button class="btn-exchange" onclick="exchangeResource('GOLD_TO_GEMS')">10,000 🪙 ➔ +15 💎</button>
+            <button class="btn-exchange" onclick="exchangeResource('GOLD_TO_DUST')">8,000 🪙 ➔ +250 🌟</button>
+            <button class="btn-exchange" onclick="exchangeResource('GOLD_TO_SUPERDUST')">35,000 🪙 ➔ +1 🌠</button>
+
+            <button class="btn-exchange" onclick="exchangeResource('GEMS_TO_GOLD')">20 💎 ➔ +10,000 🪙</button>
+            <button class="btn-exchange" onclick="exchangeResource('GEMS_TO_DUST')">20 💎 ➔ +500 🌟</button>
+            <button class="btn-exchange" onclick="exchangeResource('GEMS_TO_SUPERDUST')">35 💎 ➔ +1 🌠</button>
+
+            <button class="btn-exchange" onclick="exchangeResource('DUST_TO_GOLD')">500 🌟 ➔ +4,000 🪙</button>
+            <button class="btn-exchange" onclick="exchangeResource('DUST_TO_GEMS')">800 🌟 ➔ +15 💎</button>
+            <button class="btn-exchange" onclick="exchangeResource('DUST_TO_SUPERDUST')">1,000 🌟 ➔ +1 🌠</button>
+
+            <button class="btn-exchange" onclick="exchangeResource('SUPERDUST_TO_DUST')">1 🌠 ➔ +650 🌟</button>
+            <button class="btn-exchange" onclick="exchangeResource('SUPERDUST_TO_GEMS')">1 🌠 ➔ +20 💎</button>
+            <button class="btn-exchange" onclick="exchangeResource('SUPERDUST_TO_GOLD')">1 🌠 ➔ +20,000 🪙</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. TAB MINIGAME 30S -->
+    <section id="minigameTab" class="tab-pane">
+      <div class="minigame-layout">
+        <div class="minigame-hud-bar">
+          <div class="stat-badge">⏱️ Thời gian: <span id="minigameTimer">30s</span></div>
+          <div class="stat-badge">🎯 Điểm: <span id="minigameScore">0</span></div>
+          <div class="stat-badge">🪙 Vàng thu: <span id="minigameGoldEarned">0</span></div>
+          <div class="stat-badge">💎 Tinh Thạch: <span id="minigameGemsEarned">0</span></div>
+          <button class="btn-cyan" onclick="startMinigame()">BẮT ĐẦU CHƠI</button>
+        </div>
+        <div id="minigameField" class="minigame-interactive-canvas">
+          <div class="welcome-minigame-text">
+            Bấm "BẮT ĐẦU CHƠI" và chạm thật nhanh vào các đồng xu 🪙 và tinh thạch 💎 trước khi biến mất! Né bom 💣!
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== CÁC MODAL HỆ THỐNG ==================== -->
+
+  <!-- 1. MODAL LÊN CẤP -->
+  <div id="levelUpModal" class="modal-overlay hidden">
+    <div class="cyber-modal-card celebration">
+      <h2 class="congrats-title">CHÚC MỪNG LÊN CẤP!</h2>
+      <div id="modalNewLevel" class="level-highlight">CẤP ĐỘ 2</div>
+      <div class="rewards-box">
+        <h4>PHẦN THƯỞNG TĂNG CẤP:</h4>
+        <div id="modalLevelRewards"></div>
+      </div>
+      <button class="btn-gold-large" onclick="closeLevelUpModal()">NHẬN THƯỞNG</button>
+    </div>
+  </div>
+
+  <!-- 2. MODAL PHÂN TÁCH HÀNG LOẠT -->
+  <div id="batchScrapModal" class="modal-overlay hidden">
+    <div class="cyber-modal-card">
+      <div class="modal-header">
+        <h3>PHÂN TÁCH HÀNG LOẠT (KHÔNG CHẠM THẺ CÓ SAO)</h3>
+        <button class="btn-close-icon" onclick="closeBatchScrapModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>Chọn các phẩm cấp thẻ chưa nâng sao muốn phân tách thành Bụi Sao:</p>
+        <div class="checkbox-ranks-group">
+          <label class="rank-chk"><input type="checkbox" id="chkScrapC" checked onchange="updateBatchScrapPreview()"> Rank C (+15 🌟)</label>
+          <label class="rank-chk"><input type="checkbox" id="chkScrapB" checked onchange="updateBatchScrapPreview()"> Rank B (+35 🌟)</label>
+          <label class="rank-chk"><input type="checkbox" id="chkScrapA" onchange="updateBatchScrapPreview()"> Rank A (+85 🌟)</label>
+          <label class="rank-chk"><input type="checkbox" id="chkScrapS" onchange="updateBatchScrapPreview()"> Rank S (+250 🌟 | +1 🌠)</label>
+          <label class="rank-chk danger-chk"><input type="checkbox" id="chkScrapSSS" onchange="updateBatchScrapPreview()"> Rank SSS (+800 🌟 | +3 🌠)</label>
+        </div>
+
+        <div class="batch-preview-box">
+          <div>Số thẻ được chọn: <b><span id="batchScrapCount">0</span></b></div>
+          <div>Bụi Sao Thường nhận: <b><span id="batchDustPreview" style="color: #ffbe0b;">+0</span> 🌟</b></div>
+          <div>Bụi Siêu Cấp nhận: <b><span id="batchSuperDustPreview" style="color: #00f2fe;">+0</span> 🌠</b></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="closeBatchScrapModal()">HỦY</button>
+        <button id="btnConfirmBatchScrap" class="btn-danger" disabled onclick="executeBatchScrap()">XÁC NHẬN PHÂN TÁCH</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. MODAL ADMIN MOCKAPI CLOUD -->
+  <div id="adminModal" class="modal-overlay hidden">
+    <div class="cyber-modal-card admin-modal-wide">
+      <div class="modal-header">
+        <h3>MÁY CHỦ QUẢN TRỊ CYBERRANK CLOUD</h3>
+        <button class="btn-close-icon" onclick="closeAdminModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="admin-top-stats">
+          <span id="adminDataCount">Đang nạp dữ liệu...</span>
+          <button class="btn-cyan-small" onclick="fetchAdminData()">LÀM MỚI 🔄</button>
+        </div>
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Người Chơi</th>
+                <th>Cấp</th>
+                <th>Tài Nguyên</th>
+                <th>Team OVR</th>
+                <th>Tướng Sở Hữu</th>
+                <th>Ô Dự Bị</th>
+                <th>Hành Động</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 5 FILE MỆNH JAVASCRIPT ==================== -->
+  <script src="cardsData.js"></script>
+  <script src="gameCore.js"></script>
+  <script src="networkSync.js"></script>
+  <script src="battleEngine.js"></script>
+  <script src="uiController.js"></script>
+</body>
+</html>
