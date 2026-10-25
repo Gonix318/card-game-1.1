@@ -22,7 +22,7 @@ const battleSession = {
   targetBotTier: 1
 };
 
-// 2. BỘ TỔNG HỢP ÂM THANH CUTSCENE BẰNG WEB AUDIO API
+// 2. BỘ TỔNG HỢP ÂM THANH SUB-BASS TIM ĐẬP & XÉ RÁCH (WEB AUDIO API)
 let webAudioContext = null;
 
 function initWebAudio() {
@@ -36,82 +36,102 @@ function initWebAudio() {
   return webAudioContext;
 }
 
-function playSynthesizedJokerCutsceneSfx() {
-  try {
-    const ctx = initWebAudio();
-    const now = ctx.currentTime;
+function playJokerHeartbeatAudio() {
+  const ctx = initWebAudio();
+  if (!ctx) return;
 
-    // LỚP 1: Tiếng rè nhiễu sóng màn hình rách (0.0s - 0.7s)
-    const bufferSize = Math.floor(ctx.sampleRate * 0.7);
-    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const output = noiseBuffer.getChannelData(0);
+  const beats = [0.0, 0.42, 0.78, 1.06, 1.28, 1.45, 1.58, 1.68, 1.76, 1.82];
+
+  beats.forEach((time, index) => {
+    [0, 0.065].forEach((subOffset, subIdx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      const baseFreq = subIdx === 0 ? 80 : 55;
+      osc.frequency.setValueAtTime(baseFreq, ctx.currentTime + time + subOffset);
+      osc.frequency.exponentialRampToValueAtTime(20, ctx.currentTime + time + subOffset + 0.12);
+
+      const vol = 0.55 + (index / beats.length) * 0.45;
+      gain.gain.setValueAtTime(vol, ctx.currentTime + time + subOffset);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + time + subOffset + 0.13);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(ctx.currentTime + time + subOffset);
+      osc.stop(ctx.currentTime + time + subOffset + 0.14);
+    });
+  });
+
+  setTimeout(() => {
+    const bufferSize = Math.floor(ctx.sampleRate * 0.55);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
-      output[i] = Math.random() * 2 - 1;
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-3.2 * (i / bufferSize));
     }
 
-    const whiteNoise = ctx.createBufferSource();
-    whiteNoise.buffer = noiseBuffer;
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
 
-    const noiseFilter = ctx.createBiquadFilter();
-    noiseFilter.type = 'bandpass';
-    noiseFilter.frequency.setValueAtTime(1100, now);
-    noiseFilter.Q.setValueAtTime(3.5, now);
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(1400, ctx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.48);
+    filter.Q.value = 6;
 
-    const noiseGain = ctx.createGain();
-    noiseGain.gain.setValueAtTime(0.35, now);
-    noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+    const tearGain = ctx.createGain();
+    tearGain.gain.setValueAtTime(1.6, ctx.currentTime);
+    tearGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.52);
 
-    whiteNoise.connect(noiseFilter);
-    noiseFilter.connect(noiseGain);
-    noiseGain.connect(ctx.destination);
-    whiteNoise.start(now);
+    noise.connect(filter);
+    filter.connect(tearGain);
+    tearGain.connect(ctx.destination);
 
-    // LỚP 2: Còi báo động ma quái dồn dập (0.5s - 2.5s)
-    const riserOsc = ctx.createOscillator();
-    const riserGain = ctx.createGain();
+    noise.start();
+  }, 1900);
+}
 
-    riserOsc.type = 'sawtooth';
-    riserOsc.frequency.setValueAtTime(110, now + 0.5);
-    riserOsc.frequency.exponentialRampToValueAtTime(950, now + 2.45);
+function playJokerRealityTearEffect(callback) {
+  playJokerHeartbeatAudio();
 
-    riserGain.gain.setValueAtTime(0.01, now + 0.5);
-    riserGain.gain.linearRampToValueAtTime(0.7, now + 2.3);
-    riserGain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+  const gameRoot = document.body;
+  gameRoot.classList.add('joker-heartbeat-shake');
 
-    riserOsc.connect(riserGain);
-    riserGain.connect(ctx.destination);
-    riserOsc.start(now + 0.5);
-    riserOsc.stop(now + 2.5);
+  const overlay = document.createElement('div');
+  overlay.id = 'jokerRealitySlashOverlay';
+  document.body.appendChild(overlay);
 
-    // LỚP 3: Cú nổ Bùmmm Bass Drop kết liễu trận đấu (2.45s)
+  const slashAngles = [-35, 50, -20, 65, -70, 15];
+  const slashDelays = [420, 820, 1150, 1450, 1680, 1820];
+
+  slashDelays.forEach((delay, idx) => {
     setTimeout(() => {
-      const boomOsc = ctx.createOscillator();
-      const boomGain = ctx.createGain();
+      const slash = document.createElement('div');
+      slash.className = 'slash-tear';
+      slash.style.setProperty('--rot', `${slashAngles[idx]}deg`);
+      slash.style.background = `linear-gradient(${slashAngles[idx] + 90}deg, transparent 45%, #ff0055 48%, #ffffff 50%, #9400d3 52%, transparent 55%)`;
+      overlay.appendChild(slash);
+    }, delay);
+  });
 
-      boomOsc.type = 'sine';
-      boomOsc.frequency.setValueAtTime(180, ctx.currentTime);
-      boomOsc.frequency.exponentialRampToValueAtTime(25, ctx.currentTime + 0.8);
+  setTimeout(() => {
+    overlay.classList.add('tear-flash-shatter');
 
-      boomGain.gain.setValueAtTime(1.0, ctx.currentTime);
-      boomGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
-
-      boomOsc.connect(boomGain);
-      boomGain.connect(ctx.destination);
-
-      boomOsc.start(ctx.currentTime);
-      boomOsc.stop(ctx.currentTime + 0.8);
-    }, 2450);
-
-  } catch (err) {
-    console.warn('Web Audio API gặp sự cố kích hoạt:', err);
-  }
+    setTimeout(() => {
+      gameRoot.classList.remove('joker-heartbeat-shake');
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      if (typeof callback === 'function') callback();
+    }, 450);
+  }, 1900);
 }
 
 // 3. KHỞI TẠO ĐỘI HÌNH BOT / BOSS BÁM ĐUỔI THEO TEAM OVR
 function generateDynamicOpponentDeck(ovrMultiplier, benchCount = 2) {
   const playerOvr = calculateTeamOVR();
   const targetOvr = Math.max(250, Math.round(playerOvr * ovrMultiplier));
-  const baseCardPower = targetOvr / 0.8 / 5; // Tính sức mạnh bình quân mỗi thẻ
+  const baseCardPower = targetOvr / 0.8 / 5;
 
   const pool = MASTER_CARD_DATABASE.filter(c => !c.eventExclusive);
   const generatedMain = [];
@@ -179,7 +199,6 @@ function startQuickMatch(botTier) {
     jokerDeathDeckBonus: 1.0
   };
 
-  // Khởi tạo thẻ phía người chơi
   battleSession.playerField = gameState.player.deck.main.map(card => {
     const effectiveStars = (card.rainbowStars || 0) * 7 + (card.stars || 0);
     const starMult = 1 + effectiveStars * 0.18;
@@ -208,12 +227,10 @@ function startQuickMatch(botTier) {
     };
   });
 
-  // Khởi tạo phía Bot
   const botDeck = generateDynamicOpponentDeck(targetMultiplier, Math.min(4, botTier));
   battleSession.botField = botDeck.main;
   battleSession.botBench = botDeck.sub;
 
-  // Chuyển giao diện sang sàn đấu trực chiến
   document.getElementById('botSelectView')?.classList.add('hidden');
   document.getElementById('battleArenaView')?.classList.remove('hidden');
 
@@ -313,18 +330,15 @@ function selectCombatTarget(targetUid) {
 
   if (!attacker || !target || target.currentHp <= 0) return;
 
-  // Thực hiện đòn tấn công của người chơi
   executePlayerAttack(attacker, target);
 }
 
 function executePlayerAttack(attacker, target) {
-  // ==========================================
-  // KIỂM TRA ĐẶC TÍNH ĐỘC QUYỀN: THE JOKER (1% / 5% / 10%)
-  // ==========================================
+  // KIỂM TRA ĐẶC TÍNH ĐỘC QUYỀN: THE JOKER
   if (attacker.eventExclusive || attacker.id === 'CARD_EVENT_THE_JOKER') {
     const rng = Math.random();
 
-    // 1% INSTANT WIN CUTSCENE
+    // 1% INSTANT WIN (VẾT RÁCH XÉ NÁT MÀN HÌNH + TIM ĐẬP DỒN DẬP)
     if (rng < 0.01) {
       triggerJokerCutsceneInstantWin();
       return;
@@ -342,7 +356,6 @@ function executePlayerAttack(attacker, target) {
       target.isStunned = true;
       logCombatAction(`🃏 [The Joker] Thả nụ cười rùng rợn! [${target.name}] bị Choáng 1 lượt!`);
       
-      // 1% tỷ lệ trảm 2 tướng ngẫu nhiên bên trong
       if (Math.random() < 0.01) {
         const aliveBotCards = battleSession.botField.filter(c => c.currentHp > 0);
         const executeCount = Math.min(2, aliveBotCards.length);
@@ -354,12 +367,9 @@ function executePlayerAttack(attacker, target) {
     }
   }
 
-  // ==========================================
   // TÍNH TOÁN HỆ SỐ SÁT THƯƠNG
-  // ==========================================
   let baseDamage = attacker.combatAtk;
 
-  // Hệ số khắc chế nguyên tố (x1.35)
   const elemCfg = ELEMENTS[attacker.element];
   let isCritElem = false;
   if (elemCfg && elemCfg.strongAgainst === target.element) {
@@ -367,17 +377,14 @@ function executePlayerAttack(attacker, target) {
     isCritElem = true;
   }
 
-  // Buff Bạo kích (Overload)
   if (battleSession.activeBuffs.overloadActive) {
     baseDamage = Math.round(baseDamage * 1.6);
     battleSession.activeBuffs.overloadActive = false;
     logCombatAction('⚡ Kích hoạt Bạo Kích Overload (+60% DMG)!');
   }
 
-  // Buff Joker Death Deck (nếu có)
   baseDamage = Math.round(baseDamage * battleSession.activeBuffs.jokerDeathDeckBonus);
 
-  // Số lần tấn công (Nếu bật buff Haste = 8 đòn liên tiếp)
   const strikeCount = battleSession.activeBuffs.hasteActive ? 8 : 1;
   battleSession.activeBuffs.hasteActive = false;
 
@@ -388,7 +395,6 @@ function executePlayerAttack(attacker, target) {
     totalDealt += dmg;
   }
 
-  // Kỹ năng chuỗi xung kích ADX
   if (attacker.id === 'CARD_EVENT_ADX' && attacker.targetType === 'CHAIN_PULSE') {
     const splashDmg = Math.round(totalDealt * 0.35);
     battleSession.botField.forEach(otherTarget => {
@@ -405,13 +411,10 @@ function executePlayerAttack(attacker, target) {
     showMultiHitBurstVisual(`${strikeCount}x COMBO BURST!`);
   }
 
-  // Dọn dẹp thẻ chết và đẩy thẻ dự bị lên
   handleFieldReplacements();
 
-  // Kiểm tra điều kiện thắng trận
   if (checkBattleEndCondition()) return;
 
-  // Chuyển lượt sang Bot
   battleSession.selectedAttackerUid = null;
   battleSession.isPlayerTurn = false;
   renderCombatArena();
@@ -426,7 +429,6 @@ function executeBotTurn() {
   const activeBotCards = battleSession.botField.filter(c => c.currentHp > 0 && !c.isStunned);
   const activePlayerCards = battleSession.playerField.filter(c => c.currentHp > 0);
 
-  // Hồi phục trạng thái choáng cho những thẻ bị choáng
   battleSession.botField.forEach(c => {
     if (c.isStunned) c.isStunned = false;
   });
@@ -436,11 +438,8 @@ function executeBotTurn() {
     return;
   }
 
-  // Bot chọn thẻ công kích
   const botAttacker = activeBotCards[Math.floor(Math.random() * activeBotCards.length)];
 
-  // Chiến thuật Bot theo Tier:
-  // Bot 3 trở lên ưu tiên dứt điểm thẻ yếu máu nhất
   let playerTarget = activePlayerCards[0];
   if (battleSession.targetBotTier >= 3) {
     playerTarget = [...activePlayerCards].sort((a, b) => a.currentHp - b.currentHp)[0];
@@ -448,14 +447,12 @@ function executeBotTurn() {
     playerTarget = activePlayerCards[Math.floor(Math.random() * activePlayerCards.length)];
   }
 
-  // Kiểm tra Khiên Bất Tử của người chơi
   if (battleSession.activeBuffs.shieldActive) {
     battleSession.activeBuffs.shieldActive = false;
     logCombatAction(`🛡️ [Khiên Bất Tử] đã hấp thụ trọn vẹn đòn đánh từ [${botAttacker.name}]!`);
   } else {
     let botDmg = Math.round(botAttacker.combatAtk * (0.9 + Math.random() * 0.2));
 
-    // Khắc chế nguyên tố
     const elemCfg = ELEMENTS[botAttacker.element];
     if (elemCfg && elemCfg.strongAgainst === playerTarget.element) {
       botDmg = Math.round(botDmg * 1.35);
@@ -469,7 +466,6 @@ function executeBotTurn() {
 
   if (checkBattleEndCondition()) return;
 
-  // Trả lượt về cho người chơi
   battleSession.isPlayerTurn = true;
   battleSession.turnNumber++;
   renderCombatArena();
@@ -477,7 +473,6 @@ function executeBotTurn() {
 
 // 7. ĐẨY QUÂN DỰ BỊ VÀO SÂN KHI CÓ THẺ TỬ TRẬN
 function handleFieldReplacements() {
-  // Thay thế bên người chơi
   for (let i = 0; i < battleSession.playerField.length; i++) {
     if (battleSession.playerField[i].currentHp <= 0 && battleSession.playerBench.length > 0) {
       const substitute = battleSession.playerBench.shift();
@@ -486,7 +481,6 @@ function handleFieldReplacements() {
     }
   }
 
-  // Thay thế bên Bot
   for (let i = 0; i < battleSession.botField.length; i++) {
     if (battleSession.botField[i].currentHp <= 0 && battleSession.botBench.length > 0) {
       const substitute = battleSession.botBench.shift();
@@ -537,7 +531,6 @@ function concludeBattle(isVictory) {
   saveLocalState();
   if (typeof updateTopHUD === 'function') updateTopHUD();
 
-  // Đóng sàn đấu quay về sảnh chọn
   document.getElementById('battleArenaView')?.classList.add('hidden');
   document.getElementById('botSelectView')?.classList.remove('hidden');
 }
@@ -549,29 +542,17 @@ function surrenderBattle() {
   }
 }
 
-// 9. KÍCH HOẠT CUTSCENE THE JOKER (1% INSTANT WIN)
+// 9. KÍCH HOẠT CUTSCENE THE JOKER (INSTANT WIN)
 function triggerJokerCutsceneInstantWin() {
   battleSession.active = false;
-  const cutscene = document.getElementById('jokerCutsceneOverlay');
+  logCombatAction('🃏 THE JOKER BẮT ĐẦU XÉ RÁCH THỰC TẠI...');
 
-  if (cutscene) {
-    cutscene.classList.remove('hidden');
-    // Bắt đầu chuỗi âm thanh tổng hợp từ Web Audio API
-    playSynthesizedJokerCutsceneSfx();
-
-    // 2.8 giây sau cutscene nổ tung, xóa sổ toàn bộ sàn đấu địch
-    setTimeout(() => {
-      cutscene.classList.add('hidden');
-      battleSession.botField.forEach(c => c.currentHp = 0);
-      battleSession.botBench = [];
-      logCombatAction('🃏 THE JOKER ĐÃ XÉ RÁCH THỰC TẠI! CHIẾN THẮNG TUYỆT ĐỐI!');
-      concludeBattle(true);
-    }, 2800);
-  } else {
-    // Dự phòng nếu không tìm thấy phần tử DOM
+  playJokerRealityTearEffect(() => {
     battleSession.botField.forEach(c => c.currentHp = 0);
+    battleSession.botBench = [];
+    logCombatAction('🃏 TOÀN BỘ ĐỐI THỦ ĐÃ BỊ XÉ NÁT! CHIẾN THẮNG TUYỆT ĐỐI!');
     concludeBattle(true);
-  }
+  });
 }
 
 // 10. THAO TÁC BUFF CHIẾN THUẬT VÀ TIỆN ÍCH
@@ -635,7 +616,6 @@ function renderCombatArena() {
   const playerSlots = document.getElementById('playerFieldSlots');
   const playerBenchSlots = document.getElementById('playerBenchSlots');
 
-  // Cập nhật lượt
   if (turnEl) {
     if (battleSession.isPlayerTurn) {
       turnEl.textContent = `LƯỢT CỦA BẠN (T${battleSession.turnNumber})`;
@@ -646,11 +626,9 @@ function renderCombatArena() {
     }
   }
 
-  // Cập nhật số lượng dự bị
   if (botBenchCountEl) botBenchCountEl.textContent = `Dự bị địch: ${battleSession.botBench.length}`;
   if (playerBenchCountEl) playerBenchCountEl.textContent = `Dự bị: ${battleSession.playerBench.length}/${gameState.player.benchCapacity}`;
 
-  // Cập nhật số lượng buff trên nút
   const bH = document.getElementById('countBuffHeal');
   const bS = document.getElementById('countBuffShield');
   const bA = document.getElementById('countBuffAtk');
@@ -660,7 +638,6 @@ function renderCombatArena() {
   if (bA) bA.textContent = gameState.player.buffInventory.OVERLOAD || 0;
   if (bSp) bSp.textContent = gameState.player.buffInventory.HASTE || 0;
 
-  // Render hàng Bot
   if (botSlots) {
     botSlots.innerHTML = battleSession.botField.map(c => {
       const isDead = c.currentHp <= 0;
@@ -684,7 +661,6 @@ function renderCombatArena() {
     }).join('');
   }
 
-  // Render hàng người chơi
   if (playerSlots) {
     playerSlots.innerHTML = battleSession.playerField.map(c => {
       const isDead = c.currentHp <= 0;
@@ -716,7 +692,6 @@ function renderCombatArena() {
     }).join('');
   }
 
-  // Render khay dự bị người chơi
   if (playerBenchSlots) {
     playerBenchSlots.innerHTML = battleSession.playerBench.map(c => `
       <div class="bench-card rank-${(c.rank || 'c').toLowerCase()}">
